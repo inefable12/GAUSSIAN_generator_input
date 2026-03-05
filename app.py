@@ -12,7 +12,7 @@ st.set_page_config(
     page_icon="⚛️"
 )
 
-st.sidebar.image("/img/inGaussian.png", caption="Dr. Jesus Alvarado-Huayhuaz")
+st.sidebar.image("img/inGaussian.png", caption="Dr. Jesus Alvarado-Huayhuaz")
 
 st.sidebar.title("¿Tienes las coordenadas?")
 #st.sidebar.title("Gaussian Input Builder")
