@@ -93,7 +93,7 @@ def convert_xyz_to_gaussian(
     keyword_list = keywords.copy()
 
     if print_orbitals:
-        keyword_list.append("Pop=Full")
+        keyword_list.append("Pop=Full GFInput")
 
     if generate_cube:
         keyword_list.append("Density=Current")
