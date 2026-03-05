@@ -85,22 +85,24 @@ def convert_xyz_to_gaussian(
         title,
         chk_name,
         print_orbitals,
-        generate_cube):
+        generate_cube,
+        generate_orbital_cubes):
 
     lines = xyz_content.strip().splitlines()
     atom_lines = lines[2:]
 
-    keyword_string = " ".join(keywords)
+    keyword_list = keywords.copy()
 
-    route = f"# {method}/{basis} {keyword_string}"
-
-    extra_section = ""
-
-    if print_orbitals:
-        extra_section += "\nPop=Full\n"
+    if print_orbitals or generate_orbital_cubes:
+        keyword_list.append("Pop=Full")
+        keyword_list.append("GFInput")
 
     if generate_cube:
-        extra_section += "\nDensity=Current\n"
+        keyword_list.append("Density=Current")
+
+    keyword_string = " ".join(keyword_list)
+
+    route = f"# {method}/{basis} {keyword_string}"
 
     header = f"""%chk={chk_name}
 %mem={memory}
@@ -114,28 +116,41 @@ def convert_xyz_to_gaussian(
 
     coord_block = "\n".join(atom_lines)
 
-    cube_block = ""
+    link_blocks = ""
 
     if generate_cube:
-        cube_block = """
+        link_blocks += f"""
 
 --Link1--
-%chk={chk}
+%chk={chk_name}
+%mem={memory}
+%nprocshared={nproc}
 # {method}/{basis} Geom=AllCheck Guess=Read Density=Current
 
-MEP Cube generation
+MEP cube preparation
 
-{charge} {mult}
+{charge} {multiplicity}
 
-""".format(
-            chk=chk_name,
-            method=method,
-            basis=basis,
-            charge=charge,
-            mult=multiplicity
-        )
+"""
 
-    return header + coord_block + "\n" + cube_block
+    if generate_orbital_cubes:
+
+        link_blocks += f"""
+
+--Link1--
+%chk={chk_name}
+%mem={memory}
+%nprocshared={nproc}
+# {method}/{basis} Geom=AllCheck Guess=Read Density=Current
+
+Orbital cube preparation (HOMO/LUMO)
+
+{charge} {multiplicity}
+
+"""
+
+    return header + coord_block + "\n" + link_blocks
+
 
 
 # =====================================================
