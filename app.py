@@ -90,19 +90,28 @@ def convert_xyz_to_gaussian(
     lines = xyz_content.strip().splitlines()
     atom_lines = lines[2:]
 
-    keyword_string = " ".join(keywords)
+    keyword_list = keywords.copy()
+
+    if print_orbitals:
+        keyword_list.append("Pop=Full")
+
+    if generate_cube:
+        keyword_list.append("Density=Current")
+
+    keyword_string = " ".join(keyword_list)
 
     route = f"# {method}/{basis} {keyword_string}"
 
     extra_section = ""
-
+    
     if print_orbitals:
-        extra_section += "\nPop=Full\n"
-
+        extra_section += "\nPop=Full GFInput\n"
+    
     if generate_cube:
         extra_section += "\nDensity=Current\n"
-
+    
     header = f"""%chk={chk_name}
+
 %mem={memory}
 %nprocshared={nproc}
 {route}
